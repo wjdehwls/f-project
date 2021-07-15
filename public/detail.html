@@ -1,0 +1,142 @@
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+  <link rel="stylesheet" href="main.css">
+
+  
+</head>
+<body>
+  
+  <nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <div class="container-fluid">
+      <a class="navbar-brand" href="/index.html">가구마켓</a>
+      <span class='ms-auto mx-2' id = "userName">ds</span>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+          <li class="nav-item">
+            <a class="nav-link active" aria-current="page" href="#">Home</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#">Link</a>
+          </li>
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+              Dropdown
+            </a>
+            <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+              <li><a class="dropdown-item" href="#">Action</a></li>
+              <li><a class="dropdown-item" href="#">Another action</a></li>
+              <li><hr class="dropdown-divider"></li>
+              <li><a class="dropdown-item" href="#">Something else here</a></li>
+            </ul>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link disabled" href="#" tabindex="-1" aria-disabled="true">Disabled</a>
+          </li>
+        </ul>
+        <form class="d-flex">
+          <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
+          <button class="btn btn-outline-success" type="submit">Search</button>
+        </form>
+      </div>
+    </div>
+  </nav>
+
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+
+  <script src="/__/firebase/8.7.1/firebase-app.js"></script>
+  <script src="/__/firebase/8.7.1/firebase-auth.js"></script>
+  <script src="/__/firebase/8.7.1/firebase-firestore.js"></script>
+  <script src="/__/firebase/8.7.1/firebase-storage.js"></script>
+  <script>  
+  var firebaseConfig = {
+    apiKey: "AIzaSyCy1Q6AVz6jhkLOdRyJekQ8TQl2HVAs0g0",
+    authDomain: "f-project-75192.firebaseapp.com",
+    projectId: "f-project-75192",
+    storageBucket: "f-project-75192.appspot.com",
+    messagingSenderId: "360553916527",
+    appId: "1:360553916527:web:ca28750a2265a84dfc059a",
+    measurementId: "G-FNXEVE9086"
+  };
+ 
+  // Initialize Firebase
+  firebase.initializeApp(firebaseConfig);
+  
+  </script>
+
+  
+   
+  <script>
+    var 쿼리스트링 = new URLSearchParams(window.location.search);
+    
+    const db = firebase.firestore();
+    const storage = firebase.storage();
+
+    //유저정보 확인
+    var 뺀거 = localStorage.getItem('user')
+    $('#userName').html(JSON.parse(뺀거).displayName)
+
+    var 판매자uid;
+    var 상품명;
+
+    db.collection('product').doc(쿼리스트링.get('id')).get().then((result)=>{
+      
+      판매자uid = result.data().uid;
+      상품명 = result.data().productname;
+      var 템플릿 = `<div class="container mt-4">
+          <h5 class="my-2">상세페이지 </h5>
+          
+          <div class="detail-pic my-4" style="background-image: url(${result.data().img});"></div>
+          <div>
+            <h5>올린사람 : ${result.data().username}</h5>
+            <hr>
+            <h5 class="title">${result.data().productname}</h5>
+            <p class="date">${Date(result.data().date)} </p>
+            <p class="price">${result.data().price}</p>
+          </div>
+          <button class="btn btn-outline-secondary" id = 'edit'>수정</button>
+          <button class="btn btn-outline-secondary" id = 'chat'>채팅</button>
+      </div>`
+      
+      $('.container').append(템플릿)
+      
+      $('#edit').click(function(){
+        window.location.href = '/edit.html?id=' + 쿼리스트링.get('id')
+      })
+
+      var 내uid = JSON.parse(localStorage.getItem('user')).uid
+
+      $('#chat').click(function(){
+        var 데이터 = {
+          who : [내uid, 판매자uid],
+          product : 상품명,
+          date : new Date()
+        }
+        db.collection('chatroom').add(데이터)
+      })
+
+
+    })
+    
+    
+  </script>
+
+  <div class="container mt-4">
+  </div>
+  
+  
+</body>
+</html>
